@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>OCLM Assignment</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            color: #372549;
+            padding: 0;
+            height: 100%;
+            overflow: hidden !important;
+        }
+
+        h1 {
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            font-size: 2.25em;
+            color: #dc143c;
+            font-weight: 300;
+            margin-bottom: 3px;
+        }
+
+        .preloader {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .seconds {
+            background-color: #ee1e1e;
+            height: 3px;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+        }
+
+        .bar {
+            background: -webkit-gradient(linear, left top, right top,
+                color-stop(0%, #ee1e1e), color-stop(100%, #eeeeee));
+            height: 3px;
+            width: 0;
+        }
+
+        .animating {
+            -webkit-animation: progress 2s ease-out;
+        }
+
+        @-webkit-keyframes progress {
+            0% {
+                width: 0;
+            }
+
+            100% {
+                width: 98%;
+            }
+        }
+
+        .content {
+            padding: 2em 7em;
+            margin-left: 2px;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-content: center;
+            text-align: left;
+        }
+
+        .content p {
+            margin: 0;
+            font-size: .7em;
+            color: #bbbbbb;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="preloader">
+        <div class="content">
+            <div>
+                <h1>An error occurred!</h1>
+                <p>Contact application developers</p>
+            </div>
+        </div>
+        <div id="seconds" class="seconds">
+            <div id="bar" class="bar animating"></div>
+        </div>
+    </div>
+
+    <script>
+        const electron = require('electron');
+        const {
+            ipcRenderer
+        } = electron;
+        setTimeout(() => {
+            ipcRenderer.send('quit-main');
+        }, 20000);
+    </script>
+</body>
+
+</html>
