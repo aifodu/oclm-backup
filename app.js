@@ -70,14 +70,14 @@ function createMainWindow() {
     win = new BrowserWindow({
         x: 0,
         y: 0,
-        width: size.width / 1.5,
+        width: 650,
         height: size.height,
         show: false,
         icon: path.join(__dirname, 'assets/icons/png/favicon-32x32.png'),
-        // resizable: false,
-        // webPreferences: {
-        //     devTools: false
-        // }
+        resizable: false,
+        webPreferences: {
+            devTools: false
+        }
     });
     win.loadURL(url.format({
         pathname: `127.0.0.1:${PORT}`,
@@ -89,15 +89,6 @@ function createMainWindow() {
 }
 
 function setupListeners() {
-    ipcMain.on('print.slip', (event, slip) => {
-        startSlip(slip);
-    });
-    ipcMain.on('close.slip', () => {
-        slip.close();
-    });
-    ipcMain.on('quit-main', () => {
-        win.close();
-    });
     win.once('closed', () => {
         app.quit();
     });

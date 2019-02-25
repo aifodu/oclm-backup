@@ -4,9 +4,10 @@
       <v-card class="backup my-3 mx-3">
         <v-fab-transition>
           <v-btn
-            v-show="!doneRestoring"
+            v-show="doneRestoring"
             color="success"
             class="mt-5 mr-2"
+            @click="reset"
             fab
             dark
             absolute
@@ -19,7 +20,7 @@
         <v-card-title primary-title>
           <div>
             <h3 class="headline mb-0">
-              <v-icon>settings_backup_restore</v-icon>&nbsp;Restore data backup
+              <v-icon>cloud_download</v-icon>&nbsp;Restore data backup
             </h3>
           </div>
         </v-card-title>
@@ -27,7 +28,7 @@
           <form @submit.prevent="restore">
             <div>
               <label @click="clickInput" for="source">
-                <v-btn class="mx-0">
+                <v-btn :disabled="doneRestoring" class="mx-0">
                   <v-icon>folder_open</v-icon>&nbsp;
                   Select backup source
                 </v-btn>
@@ -46,16 +47,17 @@
               >
             </div>
             <div class="mt-4 caption" v-if="source">
-              <h4 class="text-uppercase">Selected data source</h4>
+              <h4 class="text-uppercase">Selected backup source</h4>
               <h3 class="mt-2 grey--text">Folder: {{sourceFolder}}</h3>
               <em class="grey--text">{{source}}</em>
             </div>
             <v-text-field
               solo
               class="mt-4"
-              label="Solo"
               v-model="target"
-              :append-icon="targetExist ? 'check' : 'clear'"
+              label="Application data location"
+              :disabled="doneRestoring"
+              :append-icon="targetExist ? 'check' : 'error_outline'"
               placeholder="Paste application data location here"
             ></v-text-field>
             <v-progress-linear
@@ -63,12 +65,13 @@
               background-color="blue-grey"
               color="orange"
               value="30"
+              height="5"
               v-if="restoring"
             ></v-progress-linear>
             <v-btn
               large
               color="orange"
-              :disabled="!source || !targetExist"
+              :disabled="!source || !targetExist || doneRestoring"
               @click="restore"
               class="mx-0"
             >Start Restore</v-btn>
@@ -103,12 +106,20 @@ export default {
   },
   methods: {
     restore() {
-      this.restoring = true;
-      const self = this;
-      setTimeout(function() {
-        console.log("Done restoring");
-        self.restoring = false;
-      }, 2000);
+      this.$electron.remote
+        .require("./utilities")
+        .EnsureAppClosed()
+        .then(() => {
+          this.restoring = true;
+          fs.copy(this.source, this.target)
+            .then(() => {
+              this.restoring = false;
+              this.doneRestoring = true;
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        });
     },
     clickInput() {
       document.getElementById("source").click();
@@ -118,6 +129,14 @@ export default {
       this.sourceFolder = event.target.files[0].webkitRelativePath
         .split("/")
         .slice(-1)[0];
+    },
+    reset() {
+      this.source = "";
+      this.target = "";
+      this.sourceFolder = "";
+      this.targetExist = false;
+      this.restoring = false;
+      this.doneRestoring = false;
     }
   }
 };

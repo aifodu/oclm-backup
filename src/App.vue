@@ -1,6 +1,6 @@
 <template>
   <v-app :dark="darkMode">
-    <v-toolbar dark color="pink darken-4" extended prominent>
+    <v-toolbar dark color="pink darken-3" extended prominent>
       <v-btn icon to="/">
         <v-icon>home</v-icon>
       </v-btn>
